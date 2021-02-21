@@ -3,7 +3,7 @@
 
 This mod adds a range of randomization options to alter the game experience by adding features such as:
 - Giving the player random combinations of primary and secondary attacks.
-- Randomly changeing the players boons and traits
+- Randomly changing the players boons and traits
 - Randomizing enemy encounters including bosses.
 
 ## Feature Roadmap

@@ -32,3 +32,5 @@ Mod Config Menu (Optional but recommended) - https://www.nexusmods.com/hades/mod
 ## Known Bugs
 - Health is randomly restored
 - Only weapon aspects affecting primary weapons can be randomly rolled
+- Some particle effects does not render correctly
+- Sometimes secondary weapons are not removed before a new weapon is addedd casuing the secondary attack to use all the weapon effects

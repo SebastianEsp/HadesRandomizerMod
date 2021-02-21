@@ -29,4 +29,6 @@ Mod Config Menu (Optional but recommended) - https://www.nexusmods.com/hades/mod
 - Extract the folder into to Steam\steamapps\common\Hades\Content\Mods\
 - Run modimporter.py
 
-##
+## Known Bugs
+- Health is randomly restored
+- Only weapon aspects affecting primary weapons can be randomly rolled

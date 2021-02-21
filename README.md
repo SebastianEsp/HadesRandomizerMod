@@ -1,7 +1,7 @@
 # HadesRandomizerMod
 :warning: **Before using this mod (or any mod), it is recommended to backup your save file.**:warning:
 
-This mod adds a range of randomizatoin options to alter the game experience by adding features such as:
+This mod adds a range of randomization options to alter the game experience by adding features such as:
 - Giving the player random combinations of primary and secondary attacks.
 - Randomly changeing the players boons and traits
 - Randomizing enemy encounters including bosses.

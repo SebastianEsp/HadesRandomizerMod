@@ -25,7 +25,7 @@ Mod Config Menu (Optional but recommended) - https://www.nexusmods.com/hades/mod
 
 ## Installation
 - Ensure requirements are met and mods installed
-- Pull the latest version form the git repository or the latest release from the releases tab
+- Pull the latest version from the git repository or the latest release from the releases tab
 - Extract the folder into to Steam\steamapps\common\Hades\Content\Mods\
 - Run modimporter.py
 

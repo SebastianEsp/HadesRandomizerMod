@@ -14,7 +14,7 @@ This mod adds a range of randomization options to alter the game experience by a
 - [ ] Give random weapon upgrade fx. Sniper Shot or Flurry Slash
 - [ ] Randomize enemy encounters
 - [ ] Randomize boss encounters
-- [ ] In-Game customizaton options
+- [ ] In-Game customization options
 
 ## Requirements
 ModUtil - https://github.com/MagicGonads/sgg-mod-format/tree/master/Any/ModUtil

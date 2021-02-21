@@ -1,0 +1,2 @@
+Import "HadesRandomizer.lua"
+Import "HadesRandomizerData.lua"

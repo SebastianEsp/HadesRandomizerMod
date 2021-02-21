@@ -3,8 +3,9 @@ SaveIgnores["HadesRandomizer"] = true
 
 local config = {
 	ModName = "Hades Randomizer",
-	RandomizePrimaryWeapons = false,
-	RandomizeSecondaryWeapons = false
+	RandomizePrimaryWeapons = true,
+	RandomizeSecondaryWeapons = true,
+	RandomizeCast = true,
 }
 
 if ModConfigMenu then
@@ -13,29 +14,41 @@ end
 
 HadesRandomizer.config = config
 
-local primary, secondary, cast, castRarity, weaponTrait1, weaponTrait2, weaponUpgrade
+local primary, secondary, cast, castRarity, weaponTrait1, weaponTrait2, weaponAspect
 
 OnAnyLoad{function ()
 	local currentWeaponInSlot = GetEquippedWeapon()
 	
 	if (primary ~= nil and secondary ~= nil) then
-		UnequipWeapon({ DestinationId = CurrentRun.Hero.ObjectId, Name = primary})
-		UnequipWeapon({ DestinationId = CurrentRun.Hero.ObjectId, Name = secondary})
+		RemoveActiveWeapons({primary, secondary})
+		--UnequipWeapon({ DestinationId = CurrentRun.Hero.ObjectId, Name = primary})
+		--UnequipWeapon({ DestinationId = CurrentRun.Hero.ObjectId, Name = secondary})
 	end
 	
-	primary = GetRandomPrimaryWeapon()
-	secondary = GetRandomSecondaryWeapon()
+	--Config options primary weapon
+	if config.RandomizePrimaryWeapons then
+		primary = GetRandomPrimaryWeapon()
+	else
+		primary = GetEquippedWeapon()
+	end
+
+	--Config options secondary weapon
+	if config.RandomizeSecondaryWeapons then
+		secondary = GetRandomSecondaryWeapon()
+	end
+	
 	DebugPrint({Text = "WEAPON PRIMARY "..primary})
 	DebugPrint({Text = "WEAPON SECONDARY: "..secondary})
 	SetEquippedWeapon(primary, secondary)
 
 	--Permanently remove currently equipped weapon upgrade, as this should not be reapplied.
-	if weaponUpgrade ~= nil then
-		RemoveWeaponTrait(weaponUpgrade)
+	if weaponAspect ~= nil then
+		RemoveTrait(CurrentRun.Hero, weaponAspect)
+		--RemoveWeaponTrait(weaponAspect)
 	end
-	weaponUpgrade = GetRandomWeaponUpgrade( primary, secondary )	
-	DebugPrint({Text = "WEAPON TRAIT: "..weaponUpgrade})
-	AddTraitToHero({ SkipNewTraitHighlight = skipTraitHighlight, TraitName = weaponUpgrade, Rarity = GetRarityKey(GetWeaponUpgradeLevel(currentWeaponInSlot, GetEquippedWeaponTraitIndex( currentWeaponInSlot ))) })
+	weaponAspect = GetRandomweaponAspect( primary, secondary )
+	DebugPrint({Text = "WEAPON TRAIT: "..weaponAspect})
+	AddTraitToHero({ SkipNewTraitHighlight = skipTraitHighlight, TraitName = weaponAspect, Rarity = GetRarityKey(GetWeaponUpgradeLevel(currentWeaponInSlot, GetEquippedWeaponTraitIndex( currentWeaponInSlot ))) })
 
 	--Permanently remove currently equipped cast, as this should not be reapplied.
 	if cast ~= nil then
@@ -47,7 +60,7 @@ OnAnyLoad{function ()
 	ReloadAllTraits()
 	DebugPrint({Text = "WEAPON PRIMARY: "..primary})
 	DebugPrint({Text = "WEAPON SECONDARY: "..secondary})
-	DebugPrint({Text = "WEAPON TRAIT: "..weaponUpgrade})
+	DebugPrint({Text = "WEAPON ASPECT: "..weaponAspect})
 	DebugPrint({Text = "CAST: "..cast.."RARITY: "..castRarity})
 	DebugPrint({Text = "WEAPON DATA: "..ModUtil.TableKeysString(CurrentRun.Hero.Weapons)})
 end}
@@ -64,6 +77,9 @@ function SetEquippedWeapon( primary, secondary )
     DebugPrint({ Text = "Equipping = "..primary.." - "..secondary })
 
 	if primary == "SwordWeapon" then
+		if secondary == nil then
+			secondary = "SwordParry"
+		end
 		ModUtil.MapSetTable( WeaponData, {
 			SwordWeapon = {
 				SecondaryWeapon = secondary
@@ -79,6 +95,9 @@ function SetEquippedWeapon( primary, secondary )
 		})
 		EquipPlayerWeapon( WeaponData.SwordWeapon )
 	elseif primary == "BowWeapon" then
+		if secondary == nil then
+			secondary = "BowSplitShot"
+		end
 		ModUtil.MapSetTable( WeaponData, {
 			BowWeapon = {
 				SecondaryWeapon = secondary
@@ -94,6 +113,9 @@ function SetEquippedWeapon( primary, secondary )
 		})
 		EquipPlayerWeapon( WeaponData.BowWeapon )
 	elseif primary == "SpearWeapon" then
+		if secondary == nil then
+			secondary = "SpearWeaponThrow"
+		end
 		ModUtil.MapSetTable( WeaponData, {
 			SpearWeapon = {
 				SecondaryWeapon = secondary
@@ -109,6 +131,9 @@ function SetEquippedWeapon( primary, secondary )
 		})
 		EquipPlayerWeapon( WeaponData.SpearWeapon )
 	elseif primary == "ShieldWeapon" then
+		if secondary == nil then
+			secondary = "ShieldThrow"
+		end
 		ModUtil.MapSetTable( WeaponData, {
 			ShieldWeapon = {
 				SecondaryWeapon = secondary
@@ -124,6 +149,9 @@ function SetEquippedWeapon( primary, secondary )
 		})
 		EquipPlayerWeapon( WeaponData.ShieldWeapon )
 	elseif primary == "FistWeapon" then
+		if secondary == nil then
+			secondary = "FistWeaponSpecial"
+		end
 		ModUtil.MapSetTable( WeaponData, {
 			FistWeapon = {
 				SecondaryWeapon = secondary
@@ -172,20 +200,20 @@ function GetRandomCast()
 	return cast, rarity
 end
 
-function GetRandomWeaponUpgrade( primary, secondary )
+function GetRandomweaponAspect( primary, secondary )
 	local upgrade
 	if primary == "BowWeapon" then
-		upgrade = HDRWeaponUpgrades.BowWeapon[math.random(#HDRWeaponUpgrades.BowWeapon)]
+		upgrade = HDRWeaponAspects.BowWeapon[math.random(#HDRWeaponAspects.BowWeapon)]
 	elseif primary == "SwordWeapon" then
-		upgrade = HDRWeaponUpgrades.SwordWeapon[math.random(#HDRWeaponUpgrades.SwordWeapon)]
+		upgrade = HDRWeaponAspects.SwordWeapon[math.random(#HDRWeaponAspects.SwordWeapon)]
 	elseif primary == "SpearWeapon" then
-		upgrade = HDRWeaponUpgrades.SpearWeapon[math.random(#HDRWeaponUpgrades.SpearWeapon)]
+		upgrade = HDRWeaponAspects.SpearWeapon[math.random(#HDRWeaponAspects.SpearWeapon)]
 	elseif primary == "GunWeapon" then
-		upgrade = HDRWeaponUpgrades.GunWeapon[math.random(#HDRWeaponUpgrades.GunWeapon)]
+		upgrade = HDRWeaponAspects.GunWeapon[math.random(#HDRWeaponAspects.GunWeapon)]
 	elseif primary == "ShieldWeapon" then
-		upgrade = HDRWeaponUpgrades.ShieldWeapon[math.random(#HDRWeaponUpgrades.ShieldWeapon)]
+		upgrade = HDRWeaponAspects.ShieldWeapon[math.random(#HDRWeaponAspects.ShieldWeapon)]
 	elseif primary == "FistWeapon" then
-		upgrade = HDRWeaponUpgrades.FistWeapon[math.random(#HDRWeaponUpgrades.FistWeapon)]
+		upgrade = HDRWeaponAspects.FistWeapon[math.random(#HDRWeaponAspects.FistWeapon)]
 	end
 	return upgrade
 end
@@ -197,11 +225,11 @@ function GetRandomWeaponTrait( weapon )
 			DebugPrint({Text = "ELEM: "..ModUtil.TableKeysString(value)})
 			table.insert(traits, value)
 		end
---[[ 		for _,v in HadesRandomizerData.WeaponUpgrades.HRDBowWeaponTraits do
+--[[ 		for _,v in HadesRandomizerData.weaponAspects.HRDBowWeaponTraits do
 			table.insert(traits, v)
 		end
 	elseif weapon == "BowSplitShot" then
-		for _,v in HadesRandomizerData.WeaponUpgrades.HRDBowWeaponTraits do
+		for _,v in HadesRandomizerData.weaponAspects.HRDBowWeaponTraits do
 			table.insert(traits, v)
 		end ]]
 	end
@@ -232,4 +260,23 @@ function RefreshTraits()
 			end
 		end
 	end
+end
+
+function RemoveActiveWeapons(weapons)
+	local toUnequip = {}
+
+	for key,value in pairs(weapons) do
+		DebugPrint({Text = "TO REMOVE "..value})
+		for k, weaponName in ipairs( WeaponSets.HeroPrimarySecondaryWeapons ) do
+			if value == weaponName then
+				table.insert( toUnequip, weaponName )
+			end
+		end
+	end
+
+	UnequipWeapon({ DestinationId = heroId, Names = toUnequip, UnloadPackages = false })
+end
+
+function RemoveWeaponAspect(weapons)
+	RemoveTrait()
 end

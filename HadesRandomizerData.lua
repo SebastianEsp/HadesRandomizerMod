@@ -18,7 +18,7 @@ HadesRandomizerData = {
     },
 }
 
-HDRWeaponUpgrades = {
+HDRWeaponAspects = {
     BowWeapon = {
         "BowLoadAmmoTrait",
         "BowBondTrait",

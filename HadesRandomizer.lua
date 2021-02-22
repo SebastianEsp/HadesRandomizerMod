@@ -14,9 +14,10 @@ end
 
 HadesRandomizer.config = config
 
-local primary, secondary, cast, castRarity, weaponTrait1, weaponTrait2, weaponAspect
+local primary, secondary, cast, castRarity, weaponTrait1, weaponTrait2, weaponAspect, health, prevHealth
 
 OnAnyLoad{function ()
+	DebugPrint({Text = "HEALTH"..CurrentRun.Hero.Health})
 	local currentWeaponInSlot = GetEquippedWeapon()
 	
 	if (primary ~= nil and secondary ~= nil) then
@@ -35,6 +36,22 @@ OnAnyLoad{function ()
 	--Config options secondary weapon
 	if config.RandomizeSecondaryWeapons then
 		secondary = GetRandomSecondaryWeapon()
+	else
+		secondary = ""
+	end
+
+	--Config options cast weapon
+	if config.RandomizeCast then
+		--Permanently remove currently equipped cast, as this should not be reapplied.
+		if cast ~= nil then
+			RemoveTrait( CurrentRun.Hero, cast )
+		end
+		cast, castRarity = GetRandomCast()
+		DebugPrint({Text = "CAST: "..cast.."RARITY: "..castRarity})
+		AddTraitToHero({TraitData = GetProcessedTraitData({ Unit = CurrentRun.Hero, TraitName = cast, Rarity = castRarity}) })
+	else
+		cast = ""
+		castRarity = ""
 	end
 	
 	DebugPrint({Text = "WEAPON PRIMARY "..primary})
@@ -44,19 +61,11 @@ OnAnyLoad{function ()
 	--Permanently remove currently equipped weapon upgrade, as this should not be reapplied.
 	if weaponAspect ~= nil then
 		RemoveTrait(CurrentRun.Hero, weaponAspect)
-		--RemoveWeaponTrait(weaponAspect)
 	end
 	weaponAspect = GetRandomweaponAspect( primary, secondary )
 	DebugPrint({Text = "WEAPON TRAIT: "..weaponAspect})
 	AddTraitToHero({ SkipNewTraitHighlight = skipTraitHighlight, TraitName = weaponAspect, Rarity = GetRarityKey(GetWeaponUpgradeLevel(currentWeaponInSlot, GetEquippedWeaponTraitIndex( currentWeaponInSlot ))) })
 
-	--Permanently remove currently equipped cast, as this should not be reapplied.
-	if cast ~= nil then
-		RemoveTrait( CurrentRun.Hero, cast )
-	end
-	cast, castRarity = GetRandomCast()
-	DebugPrint({Text = "CAST: "..cast.."RARITY: "..castRarity})
-	AddTraitToHero({TraitData = GetProcessedTraitData({ Unit = CurrentRun.Hero, TraitName = cast, Rarity = castRarity}) })
 	ReloadAllTraits()
 	DebugPrint({Text = "WEAPON PRIMARY: "..primary})
 	DebugPrint({Text = "WEAPON SECONDARY: "..secondary})
